@@ -1,7 +1,16 @@
-import { Application } from "express";
+import { graphqlHTTP } from 'express-graphql';
+import { schema  } from './schemas/graphql/phases'
 
-export const routes = (app: Application) => {
-  app.get("/", (req,res) => {
-    res.send("wow")
-  });
-};
+const root = {
+  hello: () => {
+    return "Working"
+  }
+}
+
+export const routes = (app) => {
+  app.use('/', graphqlHTTP({
+    schema: schema,
+    rootValue: root,
+    graphiql: true,
+  }));
+}
