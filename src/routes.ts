@@ -1,5 +1,6 @@
 import { graphqlHTTP } from 'express-graphql';
 import { schema  } from './schemas/graphql/phases'
+import { Application } from "express"
 
 const root = {
   hello: () => {
@@ -7,7 +8,7 @@ const root = {
   }
 }
 
-export const routes = (app) => {
+export const routes = (app: Application) => {
   app.use('/', graphqlHTTP({
     schema: schema,
     rootValue: root,
