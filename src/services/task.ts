@@ -4,7 +4,7 @@ import crypto from "crypto";
 
 export const insert = (task: Task, state: Phase) => {
   const id = crypto.randomUUID();
-  state.tasks.push({ ...task, id });
+  state.tasks.push({ ...task, id, done: false });
 
   return state;
 };

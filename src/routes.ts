@@ -1,7 +1,11 @@
 import { graphqlHTTP } from "express-graphql";
 import { schema } from "./schemas/graphql/phases";
 import { Application } from "express";
-import { get as getPhase, insert as insertPhase } from "./services/phase";
+import {
+  get as getPhase,
+  insert as insertPhase,
+  isPreviousPhaseCompleted,
+} from "./services/phase";
 import {
   insert as insertTask,
   update as updateTask,
@@ -17,8 +21,8 @@ const root = {
   },
 };
 
+// TODO: Implement schema validation
 export const routes = (app: Application) => {
-  // TODO: Implement validation
   app.post("/phases", (req, res) => {
     state = insertPhase(req.body, state);
 
@@ -29,15 +33,17 @@ export const routes = (app: Application) => {
     console.log(req.params.id);
     let phase = getPhase(req.params.id, state);
 
-    if (phase) {
-      phase = insertTask(req.body, phase);
-      return res.status(200).json({ success: true });
+    if (!phase) {
+      return res.status(404).json({ message: "phase not found" });
     }
 
-    return res.status(404).json({ message: "phase not found" });
+    phase = insertTask(req.body, phase);
+    phase.done = false;
+    return res.status(200).json({ success: true });
   });
 
-  app.put("/phases/:phaseId/task/:taskId/done", (req, res) => {
+  app.put("/phases/:phaseId/task/:taskId/done/:status", (req, res) => {
+    const status = req.params.status === "true" ? true : false;
     let phase = getPhase(req.params.phaseId, state);
 
     if (!phase) {
@@ -50,10 +56,18 @@ export const routes = (app: Application) => {
       return res.status(404).json({ message: "task not found" });
     }
 
-    phase = updateTask(phase, task, { done: true });
+    if (!isPreviousPhaseCompleted(phase, state)) {
+      return res
+        .status(201)
+        .json({ message: "previous phase's tasks are not completed" });
+    }
+
+    phase = updateTask(phase, task, { done: status });
 
     if (phase.tasks.every((task) => task.done === true)) {
       phase.done = true;
+    } else {
+      phase.done = false;
     }
 
     return res.status(200).json({ success: true });
