@@ -1,12 +1,11 @@
-import { phases } from "../memory"
-import { Phase } from "../schemas/db/phase"
+import { Phase } from "../schemas/db/phase";
+import crypto from "crypto";
 
-export const insert = (phase: Phase) => {
-  phases.push(phase)
+export const insert = (phase: Phase, state: Phase[]) => {
+  const id = crypto.randomUUID();
+  return [...state, { ...phase, id, tasks: [] }];
+};
 
-  return phase
-}
-
-export const get = (): Phase[] => {
-  return phases
-}
+export const get = (id: string, state: Phase[]) => {
+  return state.find((x) => x.id === id);
+};
