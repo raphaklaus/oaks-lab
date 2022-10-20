@@ -1,6 +1,8 @@
 import { Phase } from "../schemas/db/phase";
 import crypto from "crypto";
 
+// TODO: I'd separate functions like "insert" and "get" into a Repository boundary
+// And let specific things here such as the "isPreviousPhaseCompleted" function
 export const insert = (phase: Partial<Phase>, state: Phase[]) => {
   const id = crypto.randomUUID();
   return [...state, { ...phase, id, tasks: [], done: false }] as Phase[];
