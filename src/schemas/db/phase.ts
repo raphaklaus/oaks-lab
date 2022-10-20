@@ -1,7 +1,8 @@
-import { Task } from './task'
+import { Task } from "./task";
 
 export interface Phase {
-  name: string,
-  done: boolean,
-  tasks: Task[]
+  id: string;
+  name: string;
+  done: boolean;
+  tasks: Task[];
 }
