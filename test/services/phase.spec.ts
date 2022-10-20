@@ -31,9 +31,6 @@ test("should return false if previous phase is not completed", () => {
 
 test("should return true if previous phase is completed", () => {
   let state: Phase[] = [];
-  const newPhase = {
-    name: "test",
-  };
 
   state = insert({ name: "test" }, state);
   state = insert({ name: "another one" }, state);

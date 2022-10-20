@@ -30,21 +30,20 @@ export const routes = (app: Application) => {
   });
 
   app.post("/phases/:id/task", (req, res) => {
-    console.log(req.params.id);
-    let phase = getPhase(req.params.id, state);
+    const phase = getPhase(req.params.id, state);
 
     if (!phase) {
       return res.status(404).json({ message: "phase not found" });
     }
 
-    phase = insertTask(req.body, phase);
+    phase.tasks = insertTask(req.body, phase);
     phase.done = false;
     return res.status(200).json({ success: true });
   });
 
   app.put("/phases/:phaseId/task/:taskId/done/:status", (req, res) => {
     const status = req.params.status === "true" ? true : false;
-    let phase = getPhase(req.params.phaseId, state);
+    const phase = getPhase(req.params.phaseId, state);
 
     if (!phase) {
       return res.status(404).json({ message: "phase not found" });
@@ -62,7 +61,7 @@ export const routes = (app: Application) => {
         .json({ message: "previous phase's tasks are not completed" });
     }
 
-    phase = updateTask(phase, task, { done: status });
+    phase.tasks = updateTask(phase, task, { done: status });
 
     if (phase.tasks.every((task) => task.done === true)) {
       phase.done = true;
